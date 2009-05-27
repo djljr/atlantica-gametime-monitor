@@ -1,4 +1,82 @@
-<project name="GameTimeMonitor" default="main" basedir=".">
-	<target name="main">
+<project name="GameTimeMonitor" default="prep" basedir=".">
+	<property name="version" value="0.1" />
+	
+	<property name="project.root" value="." />
+	<property name="lib.dir" value="${project.root}/lib" />
+	<property name="src.dir" value="${project.root}/src" />
+	<property name="dist.dir" value="${project.root}/dist" />
+
+	<property name="build.dir" value="build" />
+	<property name="build.lib.dir" value="${build.dir}/lib" />
+	<property name="build.class.dir" value="${build.dir}/classes" />
+	
+	<path id="build.classpath">
+		<pathelement location="${build.class.dir}" />
+	</path>
+
+	<path id="runtime.classpath">
+		<pathelement location="${build.class.dir}" />
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+		
+	<target name="init" description="Initializes everything, creates directories, etc.">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.class.dir}" />
+		<mkdir dir="${build.lib.dir}" />
+		<mkdir dir="${dist.dir}" />	
 	</target>
+
+	<target name="clean" description="Cleans away all generated files.">
+		<delete dir="${build.class.dir}" />
+		<delete dir="${build.lib.dir}" />
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<echo message="Compiling shared classes from: ${src.dir}">
+		</echo>
+		<javac srcdir="${src.dir}" destdir="${build.class.dir}" debug="on" target="5">
+			<classpath refid="build.classpath" />
+		</javac>
+	</target>
+
+	<target name="copyBase" depends="init">
+		<echo message="Copying base configuration"/>
+		<copy todir="${build.class.dir}" includeemptydirs="false" preservelastmodified="true" flatten="false">
+			<fileset dir="${src.dir}">
+				<exclude name="**/.svn/**" />
+			</fileset>
+		</copy>
+
+		<copy todir="${build.lib.dir}" includeemptydirs="false" preservelastmodified="true" flatten="true">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />		
+				<exclude name="**/.svn/**" />
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="prep" depends="compile,copyBase">
+	</target>
+	
+	<target name="buildJar" depends="prep">
+		<jar destfile="${dist.dir}/GameTimeMonitor-${version}.jar">
+			<fileset dir="${build.class.dir}"/>
+			<fileset dir="${build.lib.dir}"/>
+		    <manifest>
+		      <!-- Who is building this jar? -->
+		      <attribute name="Built-By" value="${user.name}"/>
+		      <!-- Information about the program itself -->
+		      <attribute name="Implementation-Vendor" value="The Erenda Company"/>
+		      <attribute name="Implementation-Title" value="GameTimeMontior"/>
+		      <attribute name="Implementation-Version" value="${version}"/>	     
+		    </manifest>
+		</jar>
+    </target>
 </project>
