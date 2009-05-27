@@ -13,6 +13,10 @@ public class AtlanticaTime
 		this.year = year;
 	}
 	
+	public static AtlanticaTime now()
+	{
+		return fromDate(new Date());
+	}
 	public static AtlanticaTime fromDate(Date d)
 	{
 		TimeZero tz = TimeZero.getInstance();

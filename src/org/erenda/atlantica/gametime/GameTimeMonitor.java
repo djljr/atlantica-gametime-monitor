@@ -1,5 +1,10 @@
 package org.erenda.atlantica.gametime;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -45,5 +50,24 @@ public class GameTimeMonitor
 		year = Long.valueOf(line.getOptionValue("year"));
 		
 		TimeZero.initTimeZeroFromGameTime(hour, month, day, year);
+		
+		final MonitorTray tray = new MonitorTray();
+		tray.initialize();
+		
+		final List<TimeListener> listeners = new LinkedList<TimeListener>();
+		listeners.add(new ColumbusListener());
+		listeners.add(new TooltipListener());
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run()
+			{
+				AtlanticaTime time = AtlanticaTime.now();
+				for(TimeListener tl : listeners)
+				{
+					tl.onTick(tray, time);
+				}
+			}
+		}, 0, 120000);
 	}
 }

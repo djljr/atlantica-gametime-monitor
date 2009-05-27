@@ -1,0 +1,4 @@
+<project name="GameTimeMonitor" default="main" basedir=".">
+	<target name="main">
+	</target>
+</project>
