@@ -1,7 +1,6 @@
 @echo off
 
-set CLASSPATH=%CLASSPATH%;myjar.jar
-set CLASS=org.erenda.atlantica.gametime.GameTimeMonitor
+set JAR_FILE=GameTimeMonitor-0.1.jar
 
 rem Get remaining unshifted command line arguments and save them in the
 set CMD_LINE_ARGS=
@@ -12,4 +11,4 @@ shift
 goto setArgs
 :doneSetArgs
 
-javaw -classpath "%CLASSPATH%" %CLASS% %CMD_LINE_ARGS%
+java -jar %JAR_FILE% %CMD_LINE_ARGS%

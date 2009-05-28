@@ -4,21 +4,19 @@
 	<property name="project.root" value="." />
 	<property name="lib.dir" value="${project.root}/lib" />
 	<property name="src.dir" value="${project.root}/src" />
+	<property name="resource.dir" value="${project.root}/resources" />
 	<property name="dist.dir" value="${project.root}/dist" />
 
 	<property name="build.dir" value="build" />
 	<property name="build.lib.dir" value="${build.dir}/lib" />
 	<property name="build.class.dir" value="${build.dir}/classes" />
+	<property name="build.resource.dir" value="${build.dir}/resources" />
 	
+	<property name="dist.lib.dir" value="${dist.dir}/lib" />
+	<property name="dist.resource.dir" value="${dist.dir}/resources" />
+
 	<path id="build.classpath">
 		<pathelement location="${build.class.dir}" />
-	</path>
-
-	<path id="runtime.classpath">
-		<pathelement location="${build.class.dir}" />
-		<fileset dir="lib">
-			<include name="**/*.jar" />
-		</fileset>
 		<fileset dir="${lib.dir}">
 			<include name="**/*.jar" />
 		</fileset>
@@ -29,12 +27,16 @@
 		<mkdir dir="${build.class.dir}" />
 		<mkdir dir="${build.lib.dir}" />
 		<mkdir dir="${dist.dir}" />	
+		<mkdir dir="${dist.lib.dir}" />
+		<mkdir dir="${dist.resource.dir}" />
 	</target>
 
 	<target name="clean" description="Cleans away all generated files.">
 		<delete dir="${build.class.dir}" />
 		<delete dir="${build.lib.dir}" />
 		<delete dir="${build.dir}" />
+		<delete dir="${dist.resource.dir}" />
+		<delete dir="${dist.lib.dir}" />
 		<delete dir="${dist.dir}" />
 	</target>
 
@@ -52,31 +54,42 @@
 			<fileset dir="${src.dir}">
 				<exclude name="**/.svn/**" />
 			</fileset>
-		</copy>
-
-		<copy todir="${build.lib.dir}" includeemptydirs="false" preservelastmodified="true" flatten="true">
-			<fileset dir="${lib.dir}">
-				<include name="**/*.jar" />		
-				<exclude name="**/.svn/**" />
-			</fileset>
-		</copy>
+		</copy>		
 	</target>
 	
 	<target name="prep" depends="compile,copyBase">
 	</target>
 	
-	<target name="buildJar" depends="prep">
+	<target name="buildJar" depends="clean,prep">
 		<jar destfile="${dist.dir}/GameTimeMonitor-${version}.jar">
 			<fileset dir="${build.class.dir}"/>
 			<fileset dir="${build.lib.dir}"/>
 		    <manifest>
-		      <!-- Who is building this jar? -->
-		      <attribute name="Built-By" value="${user.name}"/>
-		      <!-- Information about the program itself -->
-		      <attribute name="Implementation-Vendor" value="The Erenda Company"/>
-		      <attribute name="Implementation-Title" value="GameTimeMontior"/>
-		      <attribute name="Implementation-Version" value="${version}"/>	     
+			    <!-- Who is building this jar? -->
+			    <attribute name="Built-By" value="${user.name}"/>
+			    <!-- Information about the program itself -->
+			    <attribute name="Implementation-Vendor" value="The Erenda Company"/>
+			    <attribute name="Implementation-Title" value="GameTimeMontior"/>
+			    <attribute name="Implementation-Version" value="${version}"/>
+		    	<attribute name="Main-Class" value="org.erenda.atlantica.gametime.GameTimeMonitor" />
+		    	<attribute name="Class-Path" value="lib/commons-cli-1.2.jar" />
 		    </manifest>
 		</jar>
+		<copy todir="${dist.resource.dir}" includeemptydirs="false" preservelastmodified="true" flatten="false">
+			<fileset dir="${resource.dir}">
+				<exclude name="**/.svn/**" />
+			</fileset>
+		</copy>
+
+		<copy todir="${dist.lib.dir}" includeemptydirs="false" preservelastmodified="true" flatten="true">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />		
+				<exclude name="**/.svn/**" />
+			</fileset>
+		</copy>		
+		<copy todir="${dist.dir}" file="${project.root}/monitor.bat" />
+		
+		<zip destfile="${dist.dir}/monitor.zip" basedir="${dist.dir}">
+		</zip>
     </target>
 </project>
