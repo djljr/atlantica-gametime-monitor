@@ -71,4 +71,9 @@ public class MonitorTray
 	{
 		trayIcon.displayMessage("Notice", text, MessageType.INFO);
 	}
+
+	public void changeToRed()
+	{
+		trayIcon.setImage(redImg);
+	}
 }

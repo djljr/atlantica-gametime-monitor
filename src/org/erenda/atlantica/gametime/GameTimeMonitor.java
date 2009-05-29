@@ -1,5 +1,10 @@
 package org.erenda.atlantica.gametime;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
@@ -16,6 +21,8 @@ public class GameTimeMonitor
 {
 	public static void main(String[] args)
 	{
+		String timeZeroFileName = "time-zero.tz";
+		
 		CommandLineParser parser = new PosixParser();
 		
 		Options options = new Options();
@@ -23,6 +30,7 @@ public class GameTimeMonitor
 		options.addOption("d", "day", true, "Day of month");
 		options.addOption("m", "month", true, "Month of year");
 		options.addOption("y", "year", true, "Year");
+		options.addOption("t", "time-zero", true, "Time-Zero file");
 		
 		CommandLine line = null;
 		try
@@ -37,19 +45,70 @@ public class GameTimeMonitor
 		
 		long hour, day, month, year;
 		
-		if(!line.hasOption("hour") || !line.hasOption("day") || !line.hasOption("month") || !line.hasOption("year"))
-		{
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp( "GameTimeMonitor", options );
-			return;
-		}
-			
-		hour = Long.valueOf(line.getOptionValue("hour"));
-		day = Long.valueOf(line.getOptionValue("day"));
-		month = Long.valueOf(line.getOptionValue("month"));
-		year = Long.valueOf(line.getOptionValue("year"));
+		File tzFile;
 		
-		TimeZero.initTimeZeroFromGameTime(hour, month, day, year);
+		if(!line.hasOption("time-zero"))
+			tzFile = new File(timeZeroFileName); 
+		else
+			tzFile = new File(line.getOptionValue("time-zero"));
+		
+		if(!line.hasOption("hour") || !line.hasOption("day") || !line.hasOption("month") || !line.hasOption("year"))
+		{			
+			if(!tzFile.exists())
+			{
+				showHelp(options);
+				return;
+			}
+			
+			ObjectInputStream ois = null;
+			try
+			{
+				ois = new ObjectInputStream(new FileInputStream(tzFile));
+				ois.readObject();
+			}
+			catch (Exception e)
+			{
+				showHelp(options);
+				return;
+			}
+			finally
+			{
+				try
+				{
+					if(ois != null)
+						ois.close();
+				}
+				catch (Exception e) { }
+			}
+		}
+		else
+		{
+			hour = Long.valueOf(line.getOptionValue("hour"));
+			day = Long.valueOf(line.getOptionValue("day"));
+			month = Long.valueOf(line.getOptionValue("month"));
+			year = Long.valueOf(line.getOptionValue("year"));
+			
+			TimeZero.initTimeZeroFromGameTime(hour, month, day, year);
+			ObjectOutputStream oos = null;
+			try
+			{
+				oos = new ObjectOutputStream(new FileOutputStream(tzFile));
+				oos.writeObject(TimeZero.getInstance());
+			}
+			catch(Exception e)
+			{
+				
+			}
+			finally 
+			{
+				try
+				{
+					if(oos != null)
+						oos.close();
+				}
+				catch (Exception e) { }
+			}
+		}
 		
 		final MonitorTray tray = new MonitorTray();
 		tray.initialize();
@@ -69,5 +128,11 @@ public class GameTimeMonitor
 				}
 			}
 		}, 0, 120000);
+	}
+
+	private static void showHelp(Options options)
+	{
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp( "GameTimeMonitor", options );
 	}
 }

@@ -3,9 +3,9 @@ package org.erenda.atlantica.gametime;
 import java.io.Serializable;
 import java.util.Date;
 
-public class TimeZero implements Serializable
+public final class TimeZero implements Serializable
 {
-	long timeZero;
+	private long timeZero;
 	
 	/**
 	 * 
@@ -17,10 +17,11 @@ public class TimeZero implements Serializable
 		
 	}
 	
-	private static TimeZero instance;
+	private static TimeZero instance = new TimeZero();
+	private boolean initialized = false;
 	public static TimeZero getInstance() 
 	{
-		if(instance == null)
+		if(!instance.initialized)
 			throw new RuntimeException("time zero not properly initialized");
 		
 		return instance;
@@ -41,12 +42,19 @@ public class TimeZero implements Serializable
 		time0 = time0 - month * 30 * 24 * 120;
 		time0 = time0 - year * 12 * 30 * 24 * 120;
 		
-		instance = new TimeZero();
 		instance.setTimeZero(time0);
+		instance.initialized = true;
 	}
 	
 	private void setTimeZero(long timeZero)
 	{
 		this.timeZero = timeZero;
 	}
+	
+    protected Object readResolve() 
+    {
+    	instance.initialized = initialized;
+    	instance.timeZero = timeZero;
+    	return instance;
+    }
 }

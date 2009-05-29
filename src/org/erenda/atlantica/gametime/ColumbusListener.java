@@ -8,12 +8,19 @@ public class ColumbusListener implements TimeListener
 	@Override
 	public void onTick(MonitorTray tray, AtlanticaTime time)
 	{
-		if(time.getHour() >= 9 && time.getHour() < 18 && !inColumbusTime)
+		if(time.getHour() >= 9 && time.getHour() < 18)
 		{
-			inColumbusTime = true;
-			tray.changeToGreen();
-			tray.displayMessage("Columbus Time Started");
+			if(!inColumbusTime)
+			{
+				inColumbusTime = true;
+				tray.changeToGreen();
+				tray.displayMessage("Columbus Time Started");
+			}
+		}
+		else
+		{
+			inColumbusTime = false;
+			tray.changeToRed();
 		}
 	}
-
 }

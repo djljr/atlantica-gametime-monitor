@@ -1,5 +1,5 @@
 <project name="GameTimeMonitor" default="prep" basedir=".">
-	<property name="version" value="0.1" />
+	<property name="version" value="0.2" />
 	
 	<property name="project.root" value="." />
 	<property name="lib.dir" value="${project.root}/lib" />
@@ -88,6 +88,7 @@
 			</fileset>
 		</copy>		
 		<copy todir="${dist.dir}" file="${project.root}/monitor.bat" />
+		<copy todir="${dist.dir}" file="${project.root}/time-zero.tz" />
 		
 		<zip destfile="${dist.dir}/monitor.zip" basedir="${dist.dir}">
 		</zip>

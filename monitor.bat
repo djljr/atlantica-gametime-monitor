@@ -1,6 +1,6 @@
 @echo off
 
-set JAR_FILE=GameTimeMonitor-0.1.jar
+set JAR_FILE=GameTimeMonitor-0.2.jar
 
 rem Get remaining unshifted command line arguments and save them in the
 set CMD_LINE_ARGS=
@@ -11,4 +11,4 @@ shift
 goto setArgs
 :doneSetArgs
 
-java -jar %JAR_FILE% %CMD_LINE_ARGS%
+javaw -jar %JAR_FILE% %CMD_LINE_ARGS%
